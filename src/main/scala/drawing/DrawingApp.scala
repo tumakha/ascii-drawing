@@ -10,7 +10,6 @@ object DrawingApp extends App {
 
   val commandParser = CommandParser()
   val screen = Screen()
-  var quit = false
 
   private def draw(command: Command): Unit =
     screen.draw(command) match {
@@ -23,12 +22,13 @@ object DrawingApp extends App {
 
   private def printError(error: String): Unit = println(s"ERROR: $error")
 
-  do {
+  private def run: AnyVal =
     commandParser.parse(readLine("enter command: ")) match {
-      case Right(Quit()) => quit = true
+      case Right(Quit()) => true
       case Right(command) => draw(command)
       case Left(error) => printError(error)
     }
-  } while (!quit)
+
+  Iterator.continually(run).find(_ == true)
 
 }
