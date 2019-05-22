@@ -108,9 +108,9 @@ class ScreenSpec() extends FlatSpec with Matchers {
     val screen = Screen()
     screen.draw(Canvas(20, 5))
 
-    val res = screen.draw(Quit())
+    val res = screen.draw(Quit)
     res.isFailure shouldBe true
-    res.failed.get.getMessage shouldEqual s"Command Quit() is not supported"
+    res.failed.get.getMessage shouldEqual s"Command Quit is not supported"
   }
 
   private def getContent(file: String): String = {

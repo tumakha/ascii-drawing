@@ -24,7 +24,7 @@ object DrawingApp extends App {
 
   private def run: AnyVal =
     commandParser.parse(readLine("enter command: ")) match {
-      case Right(Quit()) => true
+      case Right(Quit) => true
       case Right(command) => draw(command)
       case Left(error) => printError(error)
     }

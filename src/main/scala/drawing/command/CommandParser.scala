@@ -16,7 +16,7 @@ case class CommandParser() {
         Right(Rectangle(x1.toInt, y1.toInt, x2.toInt, y2.toInt))
       case Rectangle.pattern(_, _, _, _) =>
         Left("Rectangle upper left corner coordinates should be specified firstly")
-      case "Q" => Right(Quit())
+      case "Q" => Right(Quit)
       case _ => Left("Wrong command format")
     }
 

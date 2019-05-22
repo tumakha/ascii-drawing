@@ -57,7 +57,7 @@ class CommandParserSpec extends FlatSpec with Matchers {
 
   it should "parse Quit command" in {
     val commandParser = CommandParser()
-    commandParser.parse("Q") shouldBe Right(Quit())
+    commandParser.parse("Q") shouldBe Right(Quit)
   }
 
   it should "return Left(error) for wrong Quit format" in {
