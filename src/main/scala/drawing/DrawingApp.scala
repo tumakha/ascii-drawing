@@ -29,6 +29,6 @@ object DrawingApp extends App {
       case Left(error) => printError(error)
     }
 
-  Iterator.continually(run).find(_ == true)
+  Stream.continually(run).find(_ == true)
 
 }
