@@ -43,11 +43,10 @@ case class Screen() {
     val maxWidth = Screen.defaultTerminalWidth
     val maxHeight = Screen.defaultTerminalHeight
 
-    if (width < 0 || width > maxWidth) {
+    if (width < 0 || width > maxWidth)
       throw new IllegalArgumentException(s"Canvas width should be in range 0..$maxWidth")
-    } else if (height < 0 || height > maxHeight) {
+    else if (height < 0 || height > maxHeight)
       throw new IllegalArgumentException(s"Canvas height should be in range 0..$maxHeight")
-    }
     canvas = Array.tabulate(height + 2, width + 2)(initialValue)
   }
 
