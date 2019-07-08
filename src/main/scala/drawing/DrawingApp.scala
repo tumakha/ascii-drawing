@@ -1,6 +1,6 @@
 package drawing
 
-import drawing.command.{Command, CommandParser, Quit}
+import drawing.command.{Command, Quit}
 import drawing.screen.Screen
 
 import scala.io.StdIn.readLine
@@ -8,7 +8,6 @@ import scala.util.{Failure, Success}
 
 object DrawingApp extends App {
 
-  val commandParser = CommandParser()
   val screen = Screen()
 
   private def draw(command: Command): Unit =
@@ -23,7 +22,7 @@ object DrawingApp extends App {
   private def printError(error: String): Unit = println(s"ERROR: $error")
 
   private def run: AnyVal =
-    commandParser.parse(readLine("enter command: ")) match {
+    Command.parse(readLine("enter command: ")) match {
       case Right(Quit) => true
       case Right(command) => draw(command)
       case Left(error) => printError(error)
