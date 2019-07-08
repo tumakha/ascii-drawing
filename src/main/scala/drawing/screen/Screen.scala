@@ -1,6 +1,6 @@
 package drawing.screen
 
-import drawing.command.{Canvas, Command, Line, Rectangle}
+import drawing.command.{Canvas, Command, Line, Quit, Rectangle}
 
 import scala.util.Try
 
@@ -23,7 +23,7 @@ case class Screen() {
         case Canvas(width, height) => createCanvas(width, height)
         case line: Line => drawLine(line)
         case rectangle: Rectangle => drawRectangle(rectangle)
-        case cmd => throw new IllegalArgumentException(s"Command $cmd is not supported")
+        case Quit => ()
       }
 
       printCanvas

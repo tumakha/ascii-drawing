@@ -104,13 +104,11 @@ class ScreenSpec() extends FlatSpec with Matchers {
     res.failed.get.getMessage shouldEqual s"Coordinate y = $y is outside canvas area"
   }
 
-  it should "not handle Quit command" in {
+  it should "skip Quit command" in {
     val screen = Screen()
     screen.draw(Canvas(20, 5))
 
-    val res = screen.draw(Quit)
-    res.isFailure shouldBe true
-    res.failed.get.getMessage shouldEqual s"Command Quit is not supported"
+    screen.draw(Quit) shouldBe Success(getContent("emptyCanvas20x5.txt"))
   }
 
   private def getContent(file: String): String = {
