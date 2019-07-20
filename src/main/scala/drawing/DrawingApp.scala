@@ -1,34 +1,30 @@
 package drawing
 
 import drawing.command.{Command, Quit}
-import drawing.screen.Screen
+import drawing.screen.{EmptyScreen, Screen}
 
+import scala.annotation.tailrec
 import scala.io.StdIn.readLine
 import scala.util.{Failure, Success}
 
 object DrawingApp extends App {
 
-  val screen = Screen()
-
-  private def draw(command: Command): Command = {
-    screen.draw(command) match {
-      case Success(canvas) => println(canvas)
-      case Failure(exception) => {
+  private def nextCommand(screen: Screen): Screen =
+    Command.parse(readLine("enter command: ")).flatMap(command => screen.draw(command)) match {
+      case Success(scr) => scr
+      case Failure(exception) =>
         printError(s"${exception.getClass.getCanonicalName}. ${exception.getMessage}")
-        println(screen.printCanvas) // print previous saved canvas
-      }
+        screen
     }
-    command
-  }
 
   private def printError(error: String): Unit = println(s"ERROR: $error")
 
-  private def run: AnyVal =
-    Command.parse(readLine("enter command: ")) match {
-      case Right(command) => draw(command) == Quit
-      case Left(error) => printError(error)
-    }
+  @tailrec def run(screen: Screen): Unit = {
+    println(screen.content)
+    if (screen.command != Quit)
+      run(nextCommand(screen))
+  }
 
-  Stream.continually(run).find(_ == true)
+  run(EmptyScreen)
 
 }
