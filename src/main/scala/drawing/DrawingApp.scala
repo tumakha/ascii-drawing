@@ -7,10 +7,13 @@ import scala.annotation.tailrec
 import scala.io.StdIn.readLine
 import scala.util.{Failure, Success}
 
+/**
+  * @author Yuriy Tumakha
+  */
 object DrawingApp extends App {
 
   private def nextCommand(screen: Screen): Screen =
-    Command.parse(readLine("enter command: ")).flatMap(command => screen.draw(command)) match {
+    Command.parse(readLine("enter command: ")).flatMap(screen.draw) match {
       case Success(scr) => scr
       case Failure(exception) =>
         printError(s"${exception.getClass.getCanonicalName}. ${exception.getMessage}")

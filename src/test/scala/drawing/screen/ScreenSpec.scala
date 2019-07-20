@@ -1,11 +1,13 @@
 package drawing.screen
 
-import drawing.command.{Canvas, Line, Quit, Rectangle, Undo}
+import drawing.command.{Canvas, Line, Point, Quit, Rectangle, Undo}
 import org.scalatest._
 
 import scala.io.Source
 
-
+/**
+  * @author Yuriy Tumakha
+  */
 class ScreenSpec() extends FlatSpec with Matchers {
 
   "Screen" should "create canvas with specified size" in {
@@ -42,25 +44,25 @@ class ScreenSpec() extends FlatSpec with Matchers {
   }
 
   it should "return Failure(exception) on draw line before Canvas created" in {
-    val res = EmptyScreen.draw(Line(1, 3, 7, 3))
+    val res = EmptyScreen.draw(Line(Point(1, 3), Point(7, 3)))
     res.isFailure shouldBe true
     res.failed.get.getMessage shouldEqual s"Canvas is not created"
   }
 
   it should "draw horizontal line" in {
-    EmptyScreen.draw(Canvas(20, 5)).get.draw(Line(1, 3, 7, 3)).get.content shouldBe getContent("horizLine.txt")
+    EmptyScreen.draw(Canvas(20, 5)).get.draw(Line(Point(1, 3), Point(7, 3))).get.content shouldBe getContent("horizLine.txt")
   }
 
   it should "draw trimmed horizontal lines" in {
-    val screen = EmptyScreen.draw(Canvas(20, 5)).get.draw(Line(0, 3, 7, 3)).get
-    val command = Line(12, 1, 30, 1)
+    val screen = EmptyScreen.draw(Canvas(20, 5)).get.draw(Line(Point(0, 3), Point(7, 3))).get
+    val command = Line(Point(12, 1), Point(30, 1))
     screen.draw(command).get shouldBe DrawingScreen(command, getContent("trimmedHorizLines.txt"), screen)
   }
 
   it should "return Failure(exception) if Horizontal line coordinate y is outside canvas area" in {
     val screen = EmptyScreen.draw(Canvas(20, 5)).get
     val y = 90
-    val command = Line(12, y, 30, y)
+    val command = Line(Point(12, y), Point(30, y))
     val res = screen.draw(command)
     res.isFailure shouldBe true
     res.failed.get.getMessage shouldEqual s"Coordinate y = $y is outside canvas area"
@@ -68,36 +70,36 @@ class ScreenSpec() extends FlatSpec with Matchers {
 
   it should "draw vertical line" in {
     val screen = EmptyScreen.draw(Canvas(20, 5)).get
-    screen.draw(Line(5, 2, 5, 3)).get.content shouldBe getContent("vertLine.txt")
+    screen.draw(Line(Point(5, 2), Point(5, 3))).get.content shouldBe getContent("vertLine.txt")
   }
 
   it should "draw trimmed vertical lines" in {
-    val screen = EmptyScreen.draw(Canvas(20, 5)).get.draw(Line(5, 0, 5, 3)).get
-    screen.draw(Line(13, 5, 13, 50)).get.content shouldBe getContent("trimmedVertLines.txt")
+    val screen = EmptyScreen.draw(Canvas(20, 5)).get.draw(Line(Point(5, 0), Point(5, 3))).get
+    screen.draw(Line(Point(13, 5), Point(13, 50))).get.content shouldBe getContent("trimmedVertLines.txt")
   }
 
   it should "return Failure(exception) if Vertical line coordinate x is outside canvas area" in {
     val screen = EmptyScreen.draw(Canvas(20, 5)).get
     val x = 200
-    val res = screen.draw(Line(x, 1, x, 5))
+    val res = screen.draw(Line(Point(x, 1), Point(x, 5)))
     res.isFailure shouldBe true
     res.failed.get.getMessage shouldEqual s"Coordinate x = $x is outside canvas area"
   }
 
   it should "draw line contains single point" in {
     val screen = EmptyScreen.draw(Canvas(20, 5)).get
-    screen.draw(Line(12, 3, 12, 3)).get.content shouldBe getContent("singlePointLine.txt")
+    screen.draw(Line(Point(12, 3), Point(12, 3))).get.content shouldBe getContent("singlePointLine.txt")
   }
 
   it should "draw rectangle" in {
     val screen = EmptyScreen.draw(Canvas(20, 5)).get
-    screen.draw(Rectangle(5, 2, 17, 5)).get.content shouldBe getContent("rectangle.txt")
+    screen.draw(Rectangle(Point(5, 2), Point(17, 5))).get.content shouldBe getContent("rectangle.txt")
   }
 
   it should "return Failure(exception) if any rectangle coordinate x is outside canvas area" in {
     val screen = EmptyScreen.draw(Canvas(20, 5)).get
     val x = 21
-    val res = screen.draw(Rectangle(5, 2, x, 5))
+    val res = screen.draw(Rectangle(Point(5, 2), Point(x, 5)))
     res.isSuccess shouldBe false
     res.failed.get.getMessage shouldEqual s"Coordinate x = $x is outside canvas area"
   }
@@ -105,7 +107,7 @@ class ScreenSpec() extends FlatSpec with Matchers {
   it should "return Failure(exception) if any rectangle coordinate y is outside canvas area" in {
     val screen = EmptyScreen.draw(Canvas(20, 5)).get
     val y = 10
-    val res = screen.draw(Rectangle(5, 4, 12, y))
+    val res = screen.draw(Rectangle(Point(5, 4), Point(12, y)))
     res.isSuccess shouldBe false
     res.failed.get.getMessage shouldEqual s"Coordinate y = $y is outside canvas area"
   }
@@ -117,7 +119,7 @@ class ScreenSpec() extends FlatSpec with Matchers {
     val screen1 = screen0.draw(command1).get
     screen1 shouldBe DrawingScreen(command1, getContent("emptyCanvas20x5.txt"), screen0)
 
-    val command2 = Line(5, 2, 5, 3)
+    val command2 = Line(Point(5, 2), Point(5, 3))
     val screen2 = screen1.draw(command2).get
     screen2 shouldBe DrawingScreen(command2, getContent("vertLine.txt"), screen1)
 

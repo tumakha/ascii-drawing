@@ -10,32 +10,31 @@ case class Drawing(screen: Screen, command: Command) {
 
   type Canvas = Array[Array[Char]]
 
-  lazy val canvas: Canvas = getCanvas
+  implicit def Canvas2Content(canvas: Canvas): Content = canvas.map(_.mkString).mkString("\n")
+
+  private lazy val canvas: Canvas =
+    if (screen.content.isEmpty) throw new IllegalStateException("Canvas is not created")
+    else screen.content.split("\n").map(_.toCharArray)
+
+  private lazy val maxX: Int = canvas(0).length - 2
+  private lazy val maxY: Int = canvas.length - 2
 
   def draw(): Screen = {
-    val content = command match {
+    val content: Content = command match {
       case Canvas(width, height) => createCanvas(width, height)
       case line: Line => drawLine(line)
       case rectangle: Rectangle => drawRectangle(rectangle)
-      case Quit => ""
+      case Quit | Empty => ""
       case Undo => return screen.prev
-      case Empty => screen.content
     }
     DrawingScreen(command, content, screen)
   }
 
-  private def getCanvas: Canvas =
-    if (screen.content.isEmpty) throw new IllegalStateException("Canvas is not created")
-    else screen.content.split("\n").map(_.toCharArray)
-
-  private def toContent(canvas: Canvas): Content = canvas.map(_.mkString).mkString("\n")
-
-  private def createCanvas(width: Int, height: Int): Content = {
-    def initialValue(i: Int, j: Int): Char = {
+  private def createCanvas(width: Int, height: Int): Canvas = {
+    def initialValue(i: Int, j: Int): Char =
       if (i == 0 || i == height + 1) '-'
       else if (j == 0 || j == width + 1) '|'
       else ' '
-    }
 
     val maxWidth = Screen.defaultTerminalWidth
     val maxHeight = Screen.defaultTerminalHeight
@@ -45,41 +44,34 @@ case class Drawing(screen: Screen, command: Command) {
     else if (height < 0 || height > maxHeight)
       throw new IllegalArgumentException(s"Canvas height should be in range 0..$maxHeight")
 
-    toContent(Array.tabulate(height + 2, width + 2)(initialValue))
+    Array.tabulate(height + 2, width + 2)(initialValue)
   }
 
-  private def drawLine(line: Line): String = {
+  private def drawLine(line: Line): Canvas = {
     if (line.horizontal) {
-      checkCoordinate('y', line.y1, maxY)
-      val l = Seq(line.x1, line.x2).sorted
-      for (x <- l.head to l.last) {
-        canvas(line.y1)(safeX(x)) = line.brush
-      }
+      checkYCoordinate(line.point1.y)
+      rangeAsc(line.point1.x, line.point2.x).foreach(x => canvas(line.point1.y)(safeX(x)) = line.brush)
     } else if (line.vertical) {
-      checkCoordinate('x', line.x1, maxX)
-      val l = Seq(line.y1, line.y2).sorted
-      for (y <- l.head to l.last) {
-        canvas(safeY(y))(line.x1) = line.brush
-      }
+      checkXCoordinate(line.point1.x)
+      rangeAsc(line.point1.y, line.point2.y).foreach(y => canvas(safeY(y))(line.point1.x) = line.brush)
     }
-    toContent(canvas)
+    canvas
   }
 
-  private def drawRectangle(rec: Rectangle): String = {
-    checkCoordinate('x', rec.x1, maxX)
-    checkCoordinate('x', rec.x2, maxX)
-    checkCoordinate('y', rec.y1, maxY)
-    checkCoordinate('y', rec.y2, maxY)
+  private def drawRectangle(rec: Rectangle): Canvas = {
+    checkXCoordinate(rec.point1.x)
+    checkXCoordinate(rec.point2.x)
+    checkYCoordinate(rec.point1.y)
+    checkYCoordinate(rec.point2.y)
 
-    drawLine(Line(rec.x1, rec.y1, rec.x2, rec.y1, rec.brush))
-    drawLine(Line(rec.x2, rec.y1, rec.x2, rec.y2, rec.brush))
-    drawLine(Line(rec.x2, rec.y2, rec.x1, rec.y2, rec.brush))
-    drawLine(Line(rec.x1, rec.y2, rec.x1, rec.y1, rec.brush))
+    val point21 = Point(rec.point2.x, rec.point1.y)
+    val point12 = Point(rec.point1.x, rec.point2.y)
+
+    drawLine(Line(rec.point1, point21, rec.brush))
+    drawLine(Line(point21, rec.point2, rec.brush))
+    drawLine(Line(rec.point2, point12, rec.brush))
+    drawLine(Line(point12, rec.point1, rec.brush))
   }
-
-  private def maxX: Int = canvas(0).length - 2
-
-  private def maxY: Int = canvas.length - 2
 
   private def safeX(x: Int): Int = safeInt(x, maxX)
 
@@ -90,8 +82,13 @@ case class Drawing(screen: Screen, command: Command) {
     else if (n > max) max
     else n
 
+  private def checkXCoordinate(value: Int): Unit = checkCoordinate('x', value, maxX)
+  private def checkYCoordinate(value: Int): Unit = checkCoordinate('y', value, maxY)
+
   private def checkCoordinate(label: Char, value: Int, max: Int): Unit =
     if (value < 1 || value > max)
       throw new IllegalArgumentException(s"Coordinate $label = $value is outside canvas area")
+
+  private def rangeAsc(start: Int, end: Int): Range = if (start < end) start to end else end to start
 
 }

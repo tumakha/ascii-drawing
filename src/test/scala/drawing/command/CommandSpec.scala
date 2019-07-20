@@ -21,11 +21,11 @@ class CommandSpec extends FlatSpec with Matchers {
   }
 
   it should "parse Draw Line command" in {
-    Command.parse("L 1 3 7 3") shouldBe Success(Line(1, 3, 7, 3))
-    Command.parse("L 7 1 7 3") shouldBe Success(Line(7, 1, 7, 3))
+    Command.parse("L 1 3 7 3") shouldBe Success(Line(Point(1, 3), Point(7, 3)))
+    Command.parse("L 7 1 7 3") shouldBe Success(Line(Point(7, 1), Point(7, 3)))
 
     val command = Command.parse("L 22 130 22 4")
-    command shouldBe Success(Line(22, 130, 22, 4))
+    command shouldBe Success(Line(Point(22, 130), Point(22, 4)))
 
     val line = command.get.asInstanceOf[Line]
     line.horizontal shouldBe false
@@ -40,8 +40,8 @@ class CommandSpec extends FlatSpec with Matchers {
   }
 
   it should "parse Draw Rectangle command" in {
-    Command.parse("R 15 2 20 5") shouldBe Success(Rectangle(15, 2, 20, 5))
-    Command.parse("R 1 20 130 40") shouldBe Success(Rectangle(1, 20, 130, 40))
+    Command.parse("R 15 2 20 5") shouldBe Success(Rectangle(Point(15, 2), Point(20, 5)))
+    Command.parse("R 1 20 130 40") shouldBe Success(Rectangle(Point(1, 20), Point(130, 40)))
   }
 
   it should "return Exception if incorrect Draw Rectangle format" in {
