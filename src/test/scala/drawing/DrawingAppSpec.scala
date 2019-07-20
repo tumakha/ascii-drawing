@@ -46,6 +46,7 @@ class DrawingAppSpec extends StdInTestBase {
         ||              xxxxxx|
         |----------------------
         |enter command: """.stripMargin + "\n"
+
     testStdIO(in, out) {
       DrawingApp.main(null)
     }
@@ -115,6 +116,7 @@ class DrawingAppSpec extends StdInTestBase {
         ||                    |
         |----------------------
         |enter command: """.stripMargin + "\nenter command: \n"
+
     testStdIO(in, out) {
       DrawingApp.main(null)
     }
