@@ -48,33 +48,32 @@ case class Drawing(screen: Screen, command: Command) {
   }
 
   private def drawLine(line: Line): Canvas = {
-    if (line.horizontal) {
-      checkYCoordinate(line.point1.y)
-      rangeAsc(line.point1.x, line.point2.x).foreach(x => canvas(line.point1.y)(safeX(x)) = line.brush)
-    } else if (line.vertical) {
-      checkXCoordinate(line.point1.x)
-      rangeAsc(line.point1.y, line.point2.y).foreach(y => canvas(safeY(y))(line.point1.x) = line.brush)
-    }
+    checkAnyPointInsideCanvas(line.point1, line.point2)
+    drawSingleLine(line)
     canvas
   }
 
-  private def drawRectangle(rec: Rectangle): Canvas = {
-    checkXCoordinate(rec.point1.x)
-    checkXCoordinate(rec.point2.x)
-    checkYCoordinate(rec.point1.y)
-    checkYCoordinate(rec.point2.y)
+  private def drawSingleLine(line: Line): Unit =
+    if (line.horizontal) {
+      rangeAsc(line.point1.x, line.point2.x).foreach(x => canvas(safeY(line.point1.y))(safeX(x)) = line.brush)
+    } else if (line.vertical) {
+      rangeAsc(line.point1.y, line.point2.y).foreach(y => canvas(safeY(y))(safeX(line.point1.x)) = line.brush)
+    }
 
+  private def drawRectangle(rec: Rectangle): Canvas = {
     val point21 = Point(rec.point2.x, rec.point1.y)
     val point12 = Point(rec.point1.x, rec.point2.y)
 
-    drawLine(Line(rec.point1, point21, rec.brush))
-    drawLine(Line(point21, rec.point2, rec.brush))
-    drawLine(Line(rec.point2, point12, rec.brush))
-    drawLine(Line(point12, rec.point1, rec.brush))
+    checkAnyPointInsideCanvas(rec.point1, rec.point2, point12, point21)
+
+    drawSingleLine(Line(rec.point1, point21, rec.brush))
+    drawSingleLine(Line(point21, rec.point2, rec.brush))
+    drawSingleLine(Line(rec.point2, point12, rec.brush))
+    drawSingleLine(Line(point12, rec.point1, rec.brush))
+    canvas
   }
 
   private def safeX(x: Int): Int = safeInt(x, maxX)
-
   private def safeY(y: Int): Int = safeInt(y, maxY)
 
   private def safeInt(n: Int, max: Int): Int =
@@ -82,12 +81,13 @@ case class Drawing(screen: Screen, command: Command) {
     else if (n > max) max
     else n
 
-  private def checkXCoordinate(value: Int): Unit = checkCoordinate('x', value, maxX)
-  private def checkYCoordinate(value: Int): Unit = checkCoordinate('y', value, maxY)
+  private def checkAnyPointInsideCanvas(point: Point*): Unit =
+    point.find(p => xInsideCanvas(p.x) && yInsideCanvas(p.y))
+      .orElse(throw new IllegalArgumentException(s"All points are outside canvas area. ${point.toList}"))
 
-  private def checkCoordinate(label: Char, value: Int, max: Int): Unit =
-    if (value < 1 || value > max)
-      throw new IllegalArgumentException(s"Coordinate $label = $value is outside canvas area")
+  private def xInsideCanvas(x: Int): Boolean = insideCanvas(x, maxX)
+  private def yInsideCanvas(x: Int): Boolean = insideCanvas(x, maxY)
+  private def insideCanvas(value: Int, max: Int): Boolean = value > 0 && value <= max
 
   private def rangeAsc(start: Int, end: Int): Range = if (start < end) start to end else end to start
 

@@ -65,7 +65,7 @@ class ScreenSpec() extends FlatSpec with Matchers {
     val command = Line(Point(12, y), Point(30, y))
     val res = screen.draw(command)
     res.isFailure shouldBe true
-    res.failed.get.getMessage shouldEqual s"Coordinate y = $y is outside canvas area"
+    res.failed.get.getMessage shouldEqual "All points are outside canvas area. List(Point(12,90), Point(30,90))"
   }
 
   it should "draw vertical line" in {
@@ -83,7 +83,7 @@ class ScreenSpec() extends FlatSpec with Matchers {
     val x = 200
     val res = screen.draw(Line(Point(x, 1), Point(x, 5)))
     res.isFailure shouldBe true
-    res.failed.get.getMessage shouldEqual s"Coordinate x = $x is outside canvas area"
+    res.failed.get.getMessage shouldEqual "All points are outside canvas area. List(Point(200,1), Point(200,5))"
   }
 
   it should "draw line contains single point" in {
@@ -96,20 +96,24 @@ class ScreenSpec() extends FlatSpec with Matchers {
     screen.draw(Rectangle(Point(5, 2), Point(17, 5))).get.content shouldBe getContent("rectangle.txt")
   }
 
-  it should "return Failure(exception) if any rectangle coordinate x is outside canvas area" in {
+  it should "draw rectangle partially if any rectangle coordinate x is inside canvas area" in {
     val screen = EmptyScreen.draw(Canvas(20, 5)).get
     val x = 21
     val res = screen.draw(Rectangle(Point(5, 2), Point(x, 5)))
-    res.isSuccess shouldBe false
-    res.failed.get.getMessage shouldEqual s"Coordinate x = $x is outside canvas area"
+    res.isSuccess shouldBe true
   }
 
-  it should "return Failure(exception) if any rectangle coordinate y is outside canvas area" in {
+  it should "return Failure(exception) if all rectangle corners are outside canvas area" in {
     val screen = EmptyScreen.draw(Canvas(20, 5)).get
-    val y = 10
-    val res = screen.draw(Rectangle(Point(5, 4), Point(12, y)))
+    val res = screen.draw(Rectangle(Point(22, 7), Point(25, 8)))
     res.isSuccess shouldBe false
-    res.failed.get.getMessage shouldEqual s"Coordinate y = $y is outside canvas area"
+    res.failed.get.getMessage shouldEqual "All points are outside canvas area. List(Point(22,7), Point(25,8), Point(22,8), Point(25,7))"
+  }
+
+  it should "draw rectangle partially if any rectangle coordinate y is outside canvas area" in {
+    val screen = EmptyScreen.draw(Canvas(20, 5)).get
+    val res = screen.draw(Rectangle(Point(5, 4), Point(12, 10)))
+    res.isSuccess shouldBe true
   }
 
   it should "undo last operation by Undo command" in {
