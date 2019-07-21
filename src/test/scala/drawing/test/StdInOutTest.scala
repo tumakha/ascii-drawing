@@ -8,7 +8,7 @@ import org.scalatest.{FlatSpec, Matchers}
 /**
   * @author Yuriy Tumakha
   */
-abstract class StdInTestBase extends FlatSpec with Matchers {
+trait StdInOutTest extends FlatSpec with Matchers {
 
   def testStdIO(in: String, expectedOut: String)(operation: => Unit): Unit = {
     val is = new ByteArrayInputStream(in.getBytes(UTF_8))

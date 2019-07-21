@@ -1,11 +1,11 @@
 package drawing
 
-import drawing.test.StdInTestBase
+import drawing.test.StdInOutTest
 
 /**
   * @author Yuriy Tumakha
   */
-class DrawingAppSpec extends StdInTestBase {
+class DrawingAppSpec extends StdInOutTest {
 
   "DrawingApp" should "handle batch of commands" in {
     val in =
