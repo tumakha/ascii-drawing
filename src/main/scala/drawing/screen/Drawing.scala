@@ -47,33 +47,31 @@ case class Drawing(screen: Screen, command: Command) {
     Array.tabulate(height + 2, width + 2)(initialValue)
   }
 
-  private def drawLine(line: Line): Canvas = {
-    checkAnyPointInsideCanvas(line.point1, line.point2)
-    drawSingleLine(line)
-    canvas
-  }
-
-  private def drawSingleLine(line: Line): Unit =
-    if (line.horizontal) {
-      rangeAsc(line.point1.x, line.point2.x).foreach(x => canvas(safeY(line.point1.y))(safeX(x)) = line.brush)
-    } else if (line.vertical) {
-      rangeAsc(line.point1.y, line.point2.y).foreach(y => canvas(safeY(y))(safeX(line.point1.x)) = line.brush)
-    }
+  private def drawLine(line: Line): Canvas = drawingByJoinPoints(line.brush, line.point1, line.point2)
 
   private def drawRectangle(rec: Rectangle): Canvas = {
     val point21 = Point(rec.point2.x, rec.point1.y)
     val point12 = Point(rec.point1.x, rec.point2.y)
 
-    checkAnyPointInsideCanvas(rec.point1, rec.point2, point12, point21)
+    drawingByJoinPoints(rec.brush, rec.point1, point21, rec.point2, point12, rec.point1)
+  }
 
-    drawSingleLine(Line(rec.point1, point21, rec.brush))
-    drawSingleLine(Line(point21, rec.point2, rec.brush))
-    drawSingleLine(Line(rec.point2, point12, rec.brush))
-    drawSingleLine(Line(point12, rec.point1, rec.brush))
+  private def drawingByJoinPoints(brush: Char, point: Point*): Canvas = {
+    def drawSingleLine(point1: Point, point2: Point): Point = {
+      for {
+        x <- rangeAsc(point1.x, point2.x)
+        y <- rangeAsc(point1.y, point2.y)
+      } canvas(safeY(y))(safeX(x)) = brush
+      point2
+    }
+
+    checkAnyPointInsideCanvas(point: _*)
+    point.reduce(drawSingleLine)
     canvas
   }
 
   private def safeX(x: Int): Int = safeInt(x, maxX)
+
   private def safeY(y: Int): Int = safeInt(y, maxY)
 
   private def safeInt(n: Int, max: Int): Int =
@@ -81,12 +79,16 @@ case class Drawing(screen: Screen, command: Command) {
     else if (n > max) max
     else n
 
-  private def checkAnyPointInsideCanvas(point: Point*): Unit =
-    point.find(p => xInsideCanvas(p.x) && yInsideCanvas(p.y))
-      .orElse(throw new IllegalArgumentException(s"All points are outside canvas area. ${point.toList}"))
+  private def checkAnyPointInsideCanvas(point: Point*): Unit = {
+    val points = point.distinct
+    points.find(p => xInsideCanvas(p.x) && yInsideCanvas(p.y))
+      .orElse(throw new IllegalArgumentException(s"All points are outside canvas area. ${points.toList.sortBy(_.x)}"))
+  }
 
   private def xInsideCanvas(x: Int): Boolean = insideCanvas(x, maxX)
+
   private def yInsideCanvas(x: Int): Boolean = insideCanvas(x, maxY)
+
   private def insideCanvas(value: Int, max: Int): Boolean = value > 0 && value <= max
 
   private def rangeAsc(start: Int, end: Int): Range = if (start < end) start to end else end to start

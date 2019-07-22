@@ -107,7 +107,7 @@ class ScreenSpec() extends FlatSpec with Matchers {
     val screen = EmptyScreen.draw(Canvas(20, 5)).get
     val res = screen.draw(Rectangle(Point(22, 7), Point(25, 8)))
     res.isSuccess shouldBe false
-    res.failed.get.getMessage shouldEqual "All points are outside canvas area. List(Point(22,7), Point(25,8), Point(22,8), Point(25,7))"
+    res.failed.get.getMessage shouldEqual "All points are outside canvas area. List(Point(22,7), Point(22,8), Point(25,7), Point(25,8))"
   }
 
   it should "draw rectangle partially if any rectangle coordinate y is outside canvas area" in {
