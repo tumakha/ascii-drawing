@@ -8,7 +8,7 @@ import scala.io.Source
 /**
   * @author Yuriy Tumakha
   */
-class ScreenSpec() extends FlatSpec with Matchers {
+class ScreenSpec extends FlatSpec with Matchers {
 
   "Screen" should "create canvas with specified size" in {
     val screen0 = EmptyScreen
