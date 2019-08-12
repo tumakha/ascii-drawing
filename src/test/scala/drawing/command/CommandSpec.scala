@@ -33,7 +33,8 @@ class CommandSpec extends FlatSpec with Matchers {
   }
 
   it should "return Exception if incorrect Draw Line format" in {
-    Command.parse("L 20 5 15 2").failed.get.getMessage shouldBe "Only horizontal or vertical lines are supported"
+    Command.parse("L 20 5 15 2").failed.get.getMessage shouldBe
+      "requirement failed: Only horizontal or vertical lines are supported"
     Command.parse("L 1 2 3").failed.get.getMessage shouldBe "Wrong command format"
     Command.parse("L 1.5 2").failed.get.getMessage shouldBe "Wrong command format"
     Command.parse("L -10 2").failed.get.getMessage shouldBe "Wrong command format"
@@ -45,7 +46,8 @@ class CommandSpec extends FlatSpec with Matchers {
   }
 
   it should "return Exception if incorrect Draw Rectangle format" in {
-    Command.parse("R 20 5 15 2").failed.get.getMessage shouldBe "Rectangle upper left corner coordinates should be specified firstly"
+    Command.parse("R 20 5 15 2").failed.get.getMessage shouldBe
+      "requirement failed: Rectangle upper left corner coordinates should be specified firstly"
     Command.parse("R 1 2 3").failed.get.getMessage shouldBe "Wrong command format"
     Command.parse("R 1.5 2").failed.get.getMessage shouldBe "Wrong command format"
     Command.parse("R -10 2").failed.get.getMessage shouldBe "Wrong command format"
