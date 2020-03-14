@@ -3,12 +3,15 @@ package drawing.screen
 import drawing.command._
 import drawing.screen.Screen.Content
 
+import scala.util.Try
+
 /**
-  * @author Yuriy Tumakha
-  */
-case class Drawing(screen: Screen, command: Command) {
+ * @author Yuriy Tumakha
+ */
+class Drawing(val initScreen: Screen) {
 
   val defaultBrush: Char = 'x'
+  var screen: Screen = initScreen
 
   type Canvas = Array[Array[Char]]
 
@@ -21,7 +24,13 @@ case class Drawing(screen: Screen, command: Command) {
   private lazy val maxX: Int = canvas(0).length - 2
   private lazy val maxY: Int = canvas.length - 2
 
-  def draw(): Screen = {
+  def draw(command: Command): Try[Screen] =
+    Try {
+      screen = newScreen(command)
+      screen
+    }
+
+  def newScreen(command: Command): Screen = {
     val content: Content = command match {
       case Canvas(width, height) => createCanvas(width, height)
       case line: Line => drawLine(line)

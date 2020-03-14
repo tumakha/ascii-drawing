@@ -1,7 +1,7 @@
 package drawing
 
-import drawing.command.{Command, CommandParsers, Quit}
-import drawing.screen.{EmptyScreen, Screen}
+import drawing.command.{Command, CommandParsers, Empty, Quit}
+import drawing.screen.{Drawing, EmptyScreen}
 
 import scala.io.StdIn.readLine
 import scala.util.{Failure, Success, Try}
@@ -11,22 +11,21 @@ import scala.util.{Failure, Success, Try}
   */
 object DrawingApp extends App {
 
-  var screen: Screen = EmptyScreen
+  val drawing = new Drawing(EmptyScreen)
 
-  private def draw(cmd: Try[Command]): Screen = {
-    cmd flatMap screen.draw match {
-      case Success(scr) => screen = scr
+  private def drawScreen(cmd: Try[Command]): Command = {
+    cmd flatMap drawing.draw match {
+      case Success(screen) => println(screen.content)
       case Failure(exception) => printError(s"${exception.getClass.getCanonicalName}. ${exception.getMessage}")
     }
-    println(screen.content)
-    screen
+    cmd.getOrElse(Empty)
   }
 
   private def printError(error: String): Unit = println(s"ERROR: $error")
 
   Iterator.continually(readLine("enter command: "))
     .map(CommandParsers.parse)
-    .map(draw)
-    .find(_.command == Quit)
+    .map(drawScreen)
+    .find(_ == Quit)
 
 }
