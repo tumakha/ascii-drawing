@@ -16,8 +16,7 @@ class DrawingAppSpec extends StdInOutTest {
         |Q
         |""".stripMargin
     val out =
-      """
-        |enter command: ----------------------
+      """enter command: ----------------------
         ||                    |
         ||                    |
         ||                    |
@@ -65,8 +64,7 @@ class DrawingAppSpec extends StdInOutTest {
         |Q
         |""".stripMargin
     val out =
-      """
-        |enter command: ----------------------
+      """enter command: ----------------------
         ||                    |
         ||                    |
         ||                    |
