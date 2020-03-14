@@ -1,6 +1,6 @@
 package drawing
 
-import drawing.command.{Command, Quit}
+import drawing.command.{CommandParsers, Quit}
 import drawing.screen.{EmptyScreen, Screen}
 
 import scala.annotation.tailrec
@@ -13,7 +13,7 @@ import scala.util.{Failure, Success}
 object DrawingApp extends App {
 
   private def nextCommand(screen: Screen): Screen =
-    Command.parse(readLine("enter command: ")).flatMap(screen.draw) match {
+    CommandParsers.parse(readLine("enter command: ")) flatMap screen.draw match {
       case Success(scr) => scr
       case Failure(exception) =>
         printError(s"${exception.getClass.getCanonicalName}. ${exception.getMessage}")

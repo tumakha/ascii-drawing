@@ -8,6 +8,8 @@ import drawing.screen.Screen.Content
   */
 case class Drawing(screen: Screen, command: Command) {
 
+  val defaultBrush: Char = 'x'
+
   type Canvas = Array[Array[Char]]
 
   implicit def Canvas2Content(canvas: Canvas): Content = canvas.map(_.mkString).mkString("\n")
@@ -47,21 +49,21 @@ case class Drawing(screen: Screen, command: Command) {
     Array.tabulate(height + 2, width + 2)(initialValue)
   }
 
-  private def drawLine(line: Line): Canvas = drawingByJoinPoints(line.brush, line.point1, line.point2)
+  private def drawLine(line: Line): Canvas = drawingByJoinPoints(line.point1, line.point2)
 
   private def drawRectangle(rec: Rectangle): Canvas = {
     val point21 = Point(rec.point2.x, rec.point1.y)
     val point12 = Point(rec.point1.x, rec.point2.y)
 
-    drawingByJoinPoints(rec.brush, rec.point1, point21, rec.point2, point12, rec.point1)
+    drawingByJoinPoints(rec.point1, point21, rec.point2, point12, rec.point1)
   }
 
-  private def drawingByJoinPoints(brush: Char, point: Point*): Canvas = {
+  private def drawingByJoinPoints(point: Point*): Canvas = {
     def drawSingleLine(point1: Point, point2: Point): Point = {
       for {
         x <- rangeAsc(point1.x, point2.x)
         y <- rangeAsc(point1.y, point2.y)
-      } canvas(safeY(y))(safeX(x)) = brush
+      } canvas(safeY(y))(safeX(x)) = defaultBrush
       point2
     }
 
