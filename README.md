@@ -1,6 +1,6 @@
-# ascii-drawing #
+# ASCII Drawing #
 
-ASCII Drawing - test task
+[![ASCII Drawing](https://github.com/tumakha/ascii-drawing/workflows/ASCII%20Drawing/badge.svg)](https://github.com/tumakha/ascii-drawing/actions)
 
 Simplified version of Paint. The basic CLI program that allow users to:
 
