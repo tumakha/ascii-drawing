@@ -12,20 +12,20 @@ object CommandParsers extends RegexParsers {
 
   def num: Parser[Int] = digits ^^ (d => d.toInt)
 
-  def pointsPair: Parser[(Point, Point)] = num ~ num ~ num ~ num ^^ {
-    case x1 ~ y1 ~ x2 ~ y2 => (Point(x1, y1), Point(x2, y2))
+  def point: Parser[Point] = num ~ num ^^ {
+    case x ~ y => Point(x, y)
   }
 
   def canvas: Parser[Canvas] = "C" ~ num ~ num ^^ {
     case "C" ~ width ~ height => Canvas(width, height)
   }
 
-  def line: Parser[Line] = "L" ~ pointsPair ^^ {
-    case "L" ~ points => Line(points._1, points._2)
+  def line: Parser[Line] = "L" ~ point ~ point ^^ {
+    case "L" ~ point1 ~ point2 => Line(point1, point2)
   }
 
-  def rectangle: Parser[Rectangle] = "R" ~ pointsPair ^^ {
-    case "R" ~ points => Rectangle(points._1, points._2)
+  def rectangle: Parser[Rectangle] = "R" ~ point ~ point ^^ {
+    case "R" ~ point1 ~ point2 => Rectangle(point1, point2)
   }
 
   def undo: Parser[Undo.type] = """U""".r ^^ (_ => Undo)
