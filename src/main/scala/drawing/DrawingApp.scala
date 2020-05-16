@@ -21,7 +21,7 @@ object DrawingApp extends App {
     cmd.getOrElse(Empty)
   }
 
-  private def printError(error: String): Unit = println(s"ERROR: $error")
+  private def printError(error: String): Unit = println(Console.RED + s"ERROR: $error" + Console.RESET)
 
   Iterator.continually(readLine("enter command: "))
     .map(CommandParsers.parse)
